@@ -16,4 +16,14 @@ class Course
 		@meet_times = meet_times
 	end 
 
+	def get_column_index_to_check()
+		if (!meet_times.eql? "")
+			return 3 #not sure if this is the right column change it later
+		elsif (!name.eql? "")
+			return 2 #again not sure right now but w/e
+		else
+			return 0
+		end
+	end
+			
 end 
