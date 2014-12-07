@@ -3,33 +3,57 @@
 
 #this file holds the main function of the course-grabbing program.
 
-require './Course.rb'
+require './User'
 require 'selenium-webdriver'
 
-
-def main_course(username, password) 
-	#pls pass the parameters
-	#maybe I will add a prompt in case they are null
-
-	#this might change to be a parameter idk
-	courses = [(Course.new("EEL474")), (Course.new("CIS4930"))]
+def main_course() 
+	
+	user = User.make_user()
+	user.set_courses(Course.make_courses())
 
 	#selenium web driver
-	driver = Selenium::WebDriver.for(:firefox) 
-	#this is the website the program is designed for
-	driver.get "http://isis.ufl.edu"
-	valid_courses =[] 
+	driver = get_driver_firefox
+	get_website(driver) 
+	select_semester(driver)
+	log_in(driver, user)
 
-	log_in(driver, username, password)
-	courses.each do |c|
-		valid_courses << get_courses(driver, c)
-	end
+	#this method will sign up to the desired courses for the user
+	user.assign_courses(driver)
 
-	puts valid_courses
+	driver.quit
 end
 
-def log_in(driver, username, password)
+def visit_course(course)
+	#TODO
+	return true #if course added
+end
 
+def visit_specific_course(course)
+	#TODO
+	return true #if course added
+end
+
+def log_in(driver, user)	
+	#now for actually logging in...
+	usernameField = driver.find_element(:id, "username")
+	usernameField.send_keys(user.name)
+
+	passwordField = driver.find_element(:id, "password")
+	passwordField.send_keys(user.password)
+
+	loginButton = driver.find_element(:name, "login")
+	loginButton.click
+end 
+
+def get_driver_firefox()
+	driver = Selenium::WebDriver.for(:firefox) 
+end
+
+def get_website(driver)
+	driver.get "http://isis.ufl.edu"
+end 
+
+def select_semester(driver)
 	begin #open up the pull down menu in case we need to
 		springButton = driver.find_element(:link, "- Spring")
 		springButton.click
@@ -41,31 +65,24 @@ def log_in(driver, username, password)
 		springButton = driver.find_element(:link, "- Spring")
 		springButton.click
 	end
+end
 
-	#now for actually logging in...
-	usernameField = driver.find_element(:id, "username")
-	usernameField.send_keys(username)
+main_course()
 
-	passwordField = driver.find_element(:id, "password")
-	passwordField.send_keys(password)
+=begin
+def get_courses(driver)
+	courseSearch = driver.find_element(:link, "Search All Courses")
+	courseSearch.click
 
-	loginButton = driver.find_element(:name, "login")
-	loginButton.click
-end 
+	courseCodeField = driver.find_element(:name, "REGCSE") #thats the name of the input field...
+	courseCodeField.send_keys(course.code)
 
-def get_courses(driver, course)
-	courseSearch = driver.find_element(:link, "Search All Courses");
-	courseSearch.click;
-
-	courseCodeField = driver.find_element(:name, "REGCSE"); #thats the name of the input field...
-	courseCodeField.send_keys(course.code);
-
-	searchButton = driver.find_element(:xpath, "//input[@value='Search']"); #find the search button
-	searchButton.click;
+	searchButton = driver.find_element(:xpath, "//input[@value='Search']") #find the search button
+	searchButton.click
 
 	#the resultant table in the following page
-	table = driver.find_elements(:xpath, "//table")[0]; #first table in the page is the one we want
-	tableRows = table.find_elements(:tag_name, "tr"); #get the rows
+	table = driver.find_elements(:xpath, "//table")[0] #first table in the page is the one we want
+	tableRows = table.find_elements(:tag_name, "tr") #get the rows
 	acceptable_courses = [] #initialize array for the rows matching the desired course
 	
 
@@ -75,12 +92,13 @@ def get_courses(driver, course)
 			#do we want an array of acceptable courses, or do we want to just go ahead and select the course when it comes up?
 		end
 	end 
+
+	acceptable_courses.each do |c|
+		puts c[0].text
+	end
+
+	backButton = driver.find_element(:xpath, "//input[@value='Back to Registration']")
+	backButton.click
 	return acceptable_courses
 end 
-
-puts "Enter the username"
-username = gets.chomp
-puts "Enter the password lol"
-password = gets.chomp
-
-main_course(username, password)
+=end

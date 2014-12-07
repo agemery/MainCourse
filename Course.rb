@@ -1,24 +1,68 @@
 class Course
 #this class will represent a course we are trying to add.
-#since the course code is not necessarily unique to a particular
-#course, a course name may also be needed to identify which
-#course is the correct one when adding them.
+#if the course code is not sufficient to identify the course 
+#desired, use a SpecificCourse
 
-	attr_reader :code, :name, :meet_times
+	attr_reader :code
 	#meet_times is an array of Strings representing the acceptable
 	#meeting times for the course
 	#in the same format as seen in Firefox by Selenium.
 	#alternatively ^, we could use section # instead....
 
-	def initialize(course_code, course_name="", course_meet_times="")
-		@code = course_code
-		@name = course_name
-		@meet_times = course_meet_times
+	def initialize(course_code)
+		@code = course_code 
 	end 
 
-	def check_match(row)
-		#need to figure something out as far as checking the specific course
-		return row.find_elements(:tag_name, "td")[0].text.include? @code
+	def sign_up()
+		return visit_course(self)
 	end
+
+	def self.make_course()
+		puts "Enter the course code"
+		code = gets.chomp.upcase
+
+		#puts "Enter the course name if the course code is shared between different courses(e.g., CIS4930 is shared by Mobile Computing and Design Patterns)"
+		#name = gets.chomp
+		#if name.eql? ""
+		#	return Course.new(code)
+		#end
+
+		puts "Enter all specific section number(s) desired, if any (enter the correct numbers!):"
+		sections = gets.chomp.split(" ")
+
+		if sections.size == 0 #if nothing was entered
+			return Course.new(code)
+		else
+			return SpecificCourse.new(code, sections.uniq)
+		end
+	end	
+
+	def self.make_courses()
+		courses = []
+		loop do 
+			self.make_course()
+
+			entry =""
+			loop do
+				puts "Add another course? (y/n)"
+				entry = gets.chomp.downcase
+			 	if (!((entry.eql? "y") || (entry.eql? "n")))
+					puts "Invalid entry."
+					next
+				else
+					break
+				end
+			end
+
+			if (entry.eql? "n")
+				break
+			elsif (entry.eql? "y")
+				next
+			end
 			
+		end
+
+		return courses
+	end	
+
 end 
