@@ -13,8 +13,18 @@ class Course
 		@code = course_code 
 	end 
 
-	def sign_up()
-		return visit_course(self)
+	def sign_up(driver)
+		return visit_course(driver, self)
+	end
+
+	def merge_course(course)
+		if course.instance_of? Course
+			return self
+		elsif course.instance_of? SpecificCourse
+			return course.merge_course(self)
+		else
+			raise "course passed is not of type Course or SpecificCourse!"
+		end		
 	end
 
 	def self.make_course()
@@ -40,7 +50,7 @@ class Course
 	def self.make_courses()
 		courses = []
 		loop do 
-			self.make_course()
+			courses << self.make_course()
 
 			entry =""
 			loop do
@@ -65,4 +75,7 @@ class Course
 		return courses
 	end	
 
+	def to_string()
+		return @code
+	end
 end 

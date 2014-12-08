@@ -11,6 +11,11 @@ def main_course()
 	user = User.make_user()
 	user.set_courses(Course.make_courses())
 
+	puts "Courses:\n-----"
+	user.desired_courses.each do |c|
+		puts c.to_string()
+	end
+
 	#selenium web driver
 	driver = get_driver_firefox
 	get_website(driver) 
@@ -23,12 +28,42 @@ def main_course()
 	driver.quit
 end
 
-def visit_course(course)
-	#TODO
-	return true #if course added
+def visit_course(driver, course)
+
+	#driver.find_element(:link, "Search All Courses").click
+
+	courseSearch = driver.find_element(:link, "Search for Courses that Meet My Schedule");
+	courseSearch.click;
+
+	#there are multiple "MDASKEYY" fields. Get the one from the right div
+	courseCodeBox = driver.find_element(:id, "search_mts")
+	courseCodeField = courseCodeBox.find_element(:name, "MDASKEYY")
+
+	courseCodeField.send_keys(course.code)
+
+	#apparently there are also multiple "search_mts" divs. lol.
+	#this selects the second 'Search' button, which happens to be the one we want
+	searchButton = driver.find_elements(:xpath, "//input[@value='Search']")[1]
+	searchButton.click;
+
+	table = driver.find_elements(:xpath, "//table")[0]; #first table
+	tableRows = table.find_elements(:tag_name, "tr"); #get the rows
+
+	courseRow = tableRows[1]
+	if (courseRow.find_elements(:tag_name, "td")[0].text.include? "There are NO MORE sections of this course")
+		backButton = driver.find_element(:xpath, "//input[@value='Back to Registration']")
+		backButton.click
+		return false
+	else
+		submitButton = courseRow.find_element(:xpath, "//input[@type='SUBMIT']")
+		submitButton.click
+
+		yesButton = driver.find_element(:xpath, "//input[@value='Yes']")
+		return true
+	end
 end
 
-def visit_specific_course(course)
+def visit_specific_course(driver, course)
 	#TODO
 	return true #if course added
 end

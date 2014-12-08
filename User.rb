@@ -17,7 +17,24 @@ class User
 	end 
 
 	def set_courses(courses)
-		@desired_courses = courses
+		#make sure the list of courses is unique
+		#if there are two SpecificCourses with the same course code
+		#remove the duplicates and add its sections 
+		#to the original SpecificCourse
+		@desired_courses = []
+		for i in 0..(courses.size-1) do 
+			for j in (i+1)..(courses.size-1) do
+				if (!((courses[i].eql? nil) || (courses[j].eql? nil)))
+					if (courses[i].code.eql? courses[j].code)
+						courses[i] = courses[i].merge_course(courses[j])
+						courses[j] = nil
+					end
+				end
+			end
+			if(!courses[i].eql?(nil))
+				@desired_courses << courses[i]
+			end
+		end
 	end
 
 	def self.make_user()
@@ -36,9 +53,11 @@ class User
 		password = gets.chomp
 	end
 
-	def assign_courses()
+	def assign_courses(driver)
 		while (!@desired_courses.empty?)
-			if (get_current_course.sign_up)
+			val = get_current_course.sign_up(driver)
+			puts "COURSE ADDED? #{val}"
+			if (val)
 				remove_course(get_current_course)
 			end
 
@@ -51,10 +70,10 @@ class User
 	end
 
 	def next_course()
-		@current_course_counter++
+		@current_course_counter+=1
 		#wrap index around
 		if @current_course_counter >= @desired_courses.size
-			current_course_counter = 0
+			@current_course_counter = 0
 		end
 	end
 

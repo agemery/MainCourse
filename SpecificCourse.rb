@@ -13,8 +13,27 @@ class SpecificCourse < Course
 		@section_numbers = section_numbers
 	end 
 
-	def sign_up()
-		return visit_specific_course(self)
+	def sign_up(driver)
+		return visit_specific_course(driver, self)
+	end
+
+	def merge_course(course)
+		if course.instance_of? Course
+			return self
+		elsif course.instance_of? SpecificCourse
+			@section_numbers += course.section_numbers
+			return self
+		else
+			super
+		end		
+	end
+
+	def to_string()
+		sb = super + ":"
+		@section_numbers.each do |s|
+			sb += "\n\t" + s
+		end
+		return sb
 	end
 
 end
