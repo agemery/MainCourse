@@ -13,8 +13,17 @@ class User
 	def initialize(name, password)
 		@name = name
 		@password = password
-		@current_course_counter = 0;
+		@current_course_counter = 0
 	end 
+
+	def assign_courses(driver)
+		while (!@desired_courses.empty?)
+			if (get_current_course.sign_up(driver))
+				remove_course(get_current_course)
+			end
+			next_course()
+		end
+	end
 
 	def set_courses(courses)
 		#make sure the list of courses is unique
@@ -51,18 +60,6 @@ class User
 	def self.make_password()
 		puts "Enter your password"
 		password = gets.chomp
-	end
-
-	def assign_courses(driver)
-		while (!@desired_courses.empty?)
-			val = get_current_course.sign_up(driver)
-			puts "COURSE ADDED? #{val}"
-			if (val)
-				remove_course(get_current_course)
-			end
-
-			next_course()
-		end
 	end
 
 	def get_current_course()

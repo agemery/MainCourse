@@ -25,20 +25,17 @@ def main_course()
 	#this method will sign up to the desired courses for the user
 	user.assign_courses(driver)
 
-	driver.quit
+	#log_out(driver)
+	#driver.quit
 end
 
 def visit_course(driver, course)
-
-	#driver.find_element(:link, "Search All Courses").click
-
 	courseSearch = driver.find_element(:link, "Search for Courses that Meet My Schedule");
 	courseSearch.click;
 
 	#there are multiple "MDASKEYY" fields. Get the one from the right div
 	courseCodeBox = driver.find_element(:id, "search_mts")
 	courseCodeField = courseCodeBox.find_element(:name, "MDASKEYY")
-
 	courseCodeField.send_keys(course.code)
 
 	#apparently there are also multiple "search_mts" divs. lol.
@@ -53,19 +50,43 @@ def visit_course(driver, course)
 	if (courseRow.find_elements(:tag_name, "td")[0].text.include? "There are NO MORE sections of this course")
 		backButton = driver.find_element(:xpath, "//input[@value='Back to Registration']")
 		backButton.click
+		puts "#{course.code} added? FALSE"
 		return false
 	else
 		submitButton = courseRow.find_element(:xpath, "//input[@type='SUBMIT']")
 		submitButton.click
 
 		yesButton = driver.find_element(:xpath, "//input[@value='Yes']")
+		yesButton.click
+		puts "#{course.code} added? TRUE"
 		return true
 	end
 end
 
-def visit_specific_course(driver, course)
-	#TODO
-	return true #if course added
+def visit_specific_course(driver, section_number)
+	courseSearch = driver.find_element(:link, "Add a Section");
+	courseSearch.click;
+
+	#there are multiple "COMASECT" fields. Get the one from the right div)
+	courseSectionBox = driver.find_element(:id, "search_exp")
+	courseSectionField = courseSectionBox.find_element(:name, "COMASECT")
+	courseSectionField.send_keys(section_number)
+
+	addButton = driver.find_element(:xpath, "//input[@value='Add this course']")
+	addButton.click;
+
+	#always click 'Yes'
+	yesButton = driver.find_element(:xpath, "//input[@value='Yes']")
+	yesButton.click
+
+	#if "reg_good" exists then we have successfully added the course
+	if (driver.find_elements(:id, "reg_good").size > 0)
+		puts "#{section_number} added? TRUE"
+		return true
+	else
+		puts "#{section_number} added? FALSE"
+		return false
+	end
 end
 
 def log_in(driver, user)	
@@ -103,37 +124,3 @@ def select_semester(driver)
 end
 
 main_course()
-
-=begin
-def get_courses(driver)
-	courseSearch = driver.find_element(:link, "Search All Courses")
-	courseSearch.click
-
-	courseCodeField = driver.find_element(:name, "REGCSE") #thats the name of the input field...
-	courseCodeField.send_keys(course.code)
-
-	searchButton = driver.find_element(:xpath, "//input[@value='Search']") #find the search button
-	searchButton.click
-
-	#the resultant table in the following page
-	table = driver.find_elements(:xpath, "//table")[0] #first table in the page is the one we want
-	tableRows = table.find_elements(:tag_name, "tr") #get the rows
-	acceptable_courses = [] #initialize array for the rows matching the desired course
-	
-
-	tableRows[1..-1].each do |row| #the 0th row is a header row and we do not want it
-		if (course.check_match(row))
-			acceptable_courses << row 
-			#do we want an array of acceptable courses, or do we want to just go ahead and select the course when it comes up?
-		end
-	end 
-
-	acceptable_courses.each do |c|
-		puts c[0].text
-	end
-
-	backButton = driver.find_element(:xpath, "//input[@value='Back to Registration']")
-	backButton.click
-	return acceptable_courses
-end 
-=end

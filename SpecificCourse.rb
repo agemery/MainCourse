@@ -14,7 +14,13 @@ class SpecificCourse < Course
 	end 
 
 	def sign_up(driver)
-		return visit_specific_course(driver, self)
+		section_numbers.each do |s|
+			if (visit_specific_course(driver, s))
+				return true
+			end
+		end
+		#return false if the loop does not add any section number
+		return false 
 	end
 
 	def merge_course(course)
