@@ -10,7 +10,11 @@ class Course
 	#alternatively ^, we could use section # instead....
 
 	def initialize(course_code)
-		@code = course_code 
+		if course_code.size == 7
+			@code = course_code.upcase
+		else
+			raise ArgumentError.new("Invalid input. Course code must be according to format 'COR1234'.")
+		end
 	end 
 
 	def sign_up(driver)
@@ -28,27 +32,31 @@ class Course
 	end
 
 	def self.make_course()
-		puts "Enter the course code"
-		code = gets.chomp.upcase
-
-		#puts "Enter the course name if the course code is shared between different courses(e.g., CIS4930 is shared by Mobile Computing and Design Patterns)"
-		#name = gets.chomp
-		#if name.eql? ""
-		#	return Course.new(code)
-		#end
-
-		puts "Enter all specific section number(s) desired, if any (enter the correct numbers!):"
-		sections = gets.chomp.split(" ")
-
-		if sections.size == 0 #if nothing was entered
-			return Course.new(code)
-		else
-			return SpecificCourse.new(code, sections.uniq)
+		begin
+			print "[course code], [section1] [section2] [...]: "
+			entry = gets.chomp.upcase
+			temp = entry.split(", ")
+			code = temp[0].delete(" ").delete(",") #the course doe 
+			puts "code: #{code}; temp: #{temp}"
+			if temp.size == 2 #it will be 2 if sections are entered 
+				sections = temp[1].split(" ")
+				return SpecificCourse.new(code, sections.uniq)
+			else
+				return Course.new(code)
+			end
+		rescue ArgumentError => e 
+			puts e.message
+			return self.make_course()
+		rescue NoMethodError => e
+			puts "Input invalid. Check the format of your entry"
+			return self.make_course()
 		end
+		
 	end	
 
 	def self.make_courses()
 		courses = []
+		puts "Enter the course code, optionally followed by section numbers"
 		loop do 
 			courses << self.make_course()
 

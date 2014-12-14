@@ -22,7 +22,7 @@ class User
 				remove_course(get_current_course)
 			end
 			next_course()
-			sleep(5) #wait 5 seconds before trying again
+			sleep(7) #wait 10 seconds before trying again
 		end
 	end
 
@@ -54,12 +54,12 @@ class User
 	end 
 
 	def self.make_username() 
-		puts "Enter your username"
+		print "Enter your username: "
 		username = gets.chomp
 	end
 
 	def self.make_password()
-		puts "Enter your password"
+		print "Enter your password: "
 		password = gets.chomp
 	end
 

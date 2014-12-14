@@ -7,6 +7,11 @@ class SpecificCourse < Course
 	attr_reader :section_numbers
 
 	def initialize(course_code, section_numbers=[])
+	#	if (code.size == 7 && section_numbers.each{ |s|  s.size : 0 ? true}
+	#		@code = course_code.upcase
+	#	else
+	#		raise ArgumentError.new("Invalid input. Course code must be according to format 'COR1234'.")
+	#	end
 		@code = course_code 
 		#lets leave this out for now..
 		#@name = course_name
