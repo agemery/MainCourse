@@ -37,7 +37,6 @@ class Course
 			entry = gets.chomp.upcase
 			temp = entry.split(", ")
 			code = temp[0].delete(" ").delete(",") #the course doe 
-			puts "code: #{code}; temp: #{temp}"
 			if temp.size == 2 #it will be 2 if sections are entered 
 				sections = temp[1].split(" ")
 				return SpecificCourse.new(code, sections.uniq)
@@ -46,10 +45,10 @@ class Course
 			end
 		rescue ArgumentError => e 
 			puts e.message
-			return self.make_course()
+			retry
 		rescue NoMethodError => e
 			puts "Input invalid. Check the format of your entry"
-			return self.make_course()
+			retry
 		end
 		
 	end	
@@ -61,23 +60,21 @@ class Course
 			courses << self.make_course()
 
 			entry =""
-			loop do
+			begin 
 				puts "Add another course? (y/n)"
 				entry = gets.chomp.downcase
 			 	if (!((entry.eql? "y") || (entry.eql? "n")))
-					puts "Invalid entry."
-					next
-				else
-					break
-				end
+					raise ArgumentError.new("Invalid input.")
+				end 
+			rescue ArgumentError => e
+				puts e.message
+				retry
 			end
-
 			if (entry.eql? "n")
 				break
 			elsif (entry.eql? "y")
 				next
 			end
-			
 		end
 
 		return courses

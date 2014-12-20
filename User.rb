@@ -22,7 +22,7 @@ class User
 				remove_course(get_current_course)
 			end
 			next_course()
-			sleep(7) #wait 10 seconds before trying again
+			sleep(4) #wait 10 seconds before trying again
 		end
 	end
 
@@ -80,5 +80,3 @@ class User
 	end
 
 end 
-
-
